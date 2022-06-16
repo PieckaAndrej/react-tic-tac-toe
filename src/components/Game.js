@@ -180,7 +180,7 @@ export default function Game(props) {
 					arr = arr.concat(getLength(id, -offset));
 				}
 
-				if (arr.length > returnArr) {
+				if (arr.length > returnArr.length) {
 					returnArr = arr;
 				}
 			}

@@ -18,7 +18,7 @@ export default function Navbar(props) {
 		right: hover ? "40px" : "-200px",
 		transform: hover ? "rotate(160deg)" : "rotate(-20deg)",
 		transition: "0.6s",
-		opacity: props.win ? "1" : "0.2"
+		opacity: props.win ? "0.9" : "0.2"
 	}
 
 	return (
