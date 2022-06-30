@@ -1,28 +1,52 @@
-import React from "react";
+import "./App.css";
 import Navbar from "./components/Navbar";
 import Game from "./components/Game";
+import {useEffect, useState} from "react";
+import Settings from "./components/Settings";
 
 function App() {
-	const width = 5;
-	const height = 5;
-	const squareNo = width * height;
 
-	const gameStates = {
-		Playing: "playing",
-		Draw: "draw",
-		Win: "win"
+	const GAME_STATES = {
+		PLAYING: "playing",
+		DRAW: "draw",
+		WIN: "win"
 	}
 
 	const playerSymbols = ["X", "O"];
 
-	const [winningSquares, setWinningSquares] = React.useState([]);
+	// Settings States
+	const [settings, setSettings] = useState(
+		JSON.parse(localStorage.getItem("settings")) ||
+		{
+			show: true,
+			players: 0,
+			width: 5,
+			height: 5,
+		}
+	);
 
-	const [values, setValues] = React.useState(getStartingValues());
+	const squareNo = settings.width * settings.height;
+	const winningLength = settings.width === 3 ? 3 : 4;
 
-	const [gameState, setGameState] = React.useState(gameStates.Playing);
+	//Game States
+	const [winningSquares, setWinningSquares] = useState([]);
+	const [values, setValues] = useState(getStartingValues());
+	const [gameState, setGameState] = useState(GAME_STATES.PLAYING);
+	const [currentPlayer, setCurrentPlayer] = useState(0);
 
-	const [currentPlayer, setCurrentPlayer] = React.useState(0);
 
+	function handleSettings(name, value) {
+		name.forEach(n => {
+			setSettings(prevSettings => ({
+				...prevSettings,
+				[n]: value
+			}))
+		})
+	}
+
+	useEffect(() => {
+		localStorage.setItem("settings", JSON.stringify(settings));
+	}, [settings])
 
 	function getStartingValues() {
 		let arr = [];
@@ -34,11 +58,20 @@ function App() {
 		return arr;
 	}
 
+	useEffect(() => {
+		reset();
+	}, [winningLength]);
+
 	function reset() {
 		setWinningSquares([]);
 		setValues(getStartingValues());
-		setGameState(gameStates.Playing);
+		setGameState(GAME_STATES.PLAYING);
 		setCurrentPlayer(0);
+	}
+
+	async function hideSettings(ms) {
+		await new Promise(r => setTimeout(r, ms));
+		handleSettings(["show"], false)
 	}
 
 	return (
@@ -46,11 +79,11 @@ function App() {
 			<Navbar 
 				reset={reset}
 				player={currentPlayer}
-				win={gameStates.Win === gameState}
+				win={GAME_STATES.WIN === gameState}
 			/>
 			<Game 
-				width={width}
-				height={height}
+				width={settings.width}
+				height={settings.height}
 				squareNo={squareNo}
 				winningSquares={winningSquares}
 				setWinningSquares={setWinningSquares}
@@ -60,9 +93,26 @@ function App() {
 				setGameState={setGameState}
 				currentPlayer={currentPlayer}
 				setCurrentPlayer={setCurrentPlayer}
-				gameStates={gameStates}
+				GAME_STATES={GAME_STATES}
 				playerSymbols={playerSymbols}
+				noOfPlayers={settings.players + 1}
+				winningLength={winningLength}
 			/>
+			{
+				settings.show ? ( 
+					<Settings 
+						settings={settings}
+						handleSettings={handleSettings}
+						hideSettings={hideSettings}
+					/>) : (
+						<img 
+							className="settings--icon" 
+							src="gear-fill.svg" 
+							alt="settings" 
+							onClick={() => handleSettings(["show"], true)}
+						/>
+					)
+			}
 		</div>
 	);
 }

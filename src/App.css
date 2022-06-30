@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+.App {
+  background-color: #111111;
+  color: white;
+	height: 100vh;
+}
+
+.field {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	height: calc(100vh - 100px);
+	width: auto;
+}
+
+.field--grid {
+	display: grid;
+	column-gap: 10px;
+	row-gap: 10px;
+	width: min-content;
+}
+
+.field--state {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 1.3rem;
+}
+
+.square {
+	border: 1px solid #666666;
+	text-align: center;
+	font-size: 2rem;
+	display: flex;
+	align-items: center;
+}
+
+.square--symbol {
+	margin: auto;
+	font-weight: bold;
+}
+
+nav {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	overflow: hidden;
+	box-shadow: 0px 3px 5px 3px rgba(0, 0, 0, 0.1)
+}
+
+.nav--image {
+	width: 40px;
+	margin: 10px;
+}
+
+.nav--reset {
+	position: absolute;
+	width: 200px;
+}
+
+@keyframes flip {
+	0% {transform: rotateX(0)}
+	50% {transform: rotateX(90deg)}
+	50% {transform: rotateX(-90deg)}
+	100% {transform: rotateX(0)}
+}
+
+.settings {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+  background-color: #111111;
+	border: 5px solid #222222;
+	border-radius: 5px;
+	padding: 20px;
+	animation-duration: 0.3s;
+}
+
+@keyframes hide {
+	0% {
+		top: 50%;
+		left: 50;
+		opacity: 1;
+	}
+	100% {
+		top: 60%;
+		left: 60%;
+		opacity: 0;
+	}
+}
+
+@keyframes show {
+	0% {
+		top: 60%;
+		left: 60%;
+		opacity: 0;
+	}
+	100% {
+		top: 50%;
+		left: 50;
+		opacity: 1;
+	}
+}
+
+.settings--content {
+	display: grid;
+	grid-template: auto auto / 1fr 1fr;
+	gap: 20px;
+}
+
+.settings--title {
+	text-align: center;
+	margin: 10px;
+}
+
+.settings--content button {
+	background-color: #111111;
+	color: white;
+	border: 5px solid #222222;
+	border-radius: 5px;
+	min-width: 20vh;
+	max-width: 300px;
+	height: 100px;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 2rem;
+	transition: 0.3s;
+}
+
+.settings--content button:hover {
+	border: 5px solid deepskyblue;
+	transition: 0.3s;
+}
+
+.settings--section {
+	margin: 0px;
+	text-align: center;
+	grid-column: 1 / -1;
+}
+
+.settings--close {
+	cursor: pointer;
+	position: absolute;
+	top: 0%;
+	right: 0%;
+	max-height: 40px;
+	color: white;
+	border: 0;
+	background: 0;
+	margin: 10px;
+	font-size: 1.2rem;
+	font-family: 'Open Sans', sans-serif;
+	transition: 0.3s;
+}
+
+.settings--close:hover {
+	color: deepskyblue;
+	transition: 0.3s;
+}
+
+.settings--icon {
+	position: fixed;
+	bottom: 0%;
+	right: 0%;
+	margin: 20px;
+	width: 30px;
+	animation-name: rotate;
+	animation-duration: 0.3s;
+	opacity: 0.5;
+	transition: 0.3s;
+}
+
+.settings--icon:hover {
+	transition: 0.3s;
+	opacity: 1;
+	transform: rotate(-50deg);
+}
+
+@keyframes rotate {
+	0% {
+		opacity: 0;
+		transform: rotate(-90deg)
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		transform: rotate(0deg)
+	}
+}

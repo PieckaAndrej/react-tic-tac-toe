@@ -1,4 +1,4 @@
-import React from "react";
+import {useEffect} from "react";
 import Square from "./Square";
 
 export default function Game(props) {
@@ -6,15 +6,16 @@ export default function Game(props) {
 	const height = props.height;
 	const squareNo = props.squareNo;
 
-	const winningLength = 4;
+	const winningLength = props.winningLength;
 
 	const gameState = props.gameState;
 	const setGameState = props.setGameState;
-	const gameStates = props.gameStates;
+	const GAME_STATES = props.GAME_STATES;
 
 	const values = props.values;
 	const setValues = props.setValues;
 
+	const noOfPlayers = props.noOfPlayers;
 	const currentPlayer = props.currentPlayer;
 	const setCurrentPlayer = props.setCurrentPlayer;
 
@@ -30,6 +31,124 @@ export default function Game(props) {
 		gridTemplateRows: getGridTemplateStyle(height),
 		gridTemplateColumns: getGridTemplateStyle(width)
 	}
+
+	function getEmptyIndexes(field) {
+		const arr = [];
+
+		for (let i = 0; i < field.length; i++) {
+			if (field[i] === 0) {
+				arr.push(i);
+			}
+		}
+
+		return arr;
+	}
+
+	function winning(field, player) {
+		let win = false;
+		let index = 0;
+
+		while (index < field.length && !win) {
+
+			if (field[index] === player && checkSquares(index, field).length >= winningLength) {
+				win = true;
+			} else {
+				index++;
+			}
+		}
+
+		return win;
+	}
+
+	function minimax(field, player, loop, index) {
+		let empty = getEmptyIndexes(field);
+
+		loop++;
+
+		if (empty.length === 0 || loop > 4) {
+			const length = checkSquares(index, field).length;
+
+			if (player === 1) {
+				return {score: length};
+
+			} else {
+				return {score: -length};
+			}
+
+		} else if (winning(field, 1)) {
+			return {score: -20 + loop};
+
+		} else if (winning(field, 2)) {
+			return {score: 20 - loop};
+		} 
+
+		const moves = [];
+
+		// loop through available spots
+		for (let i = 0; i < empty.length; i++){
+			//create an object for each and store the index of that spot 
+			let move = {};
+			move.index = empty[i];
+
+			// set the empty spt to the current player
+			field[empty[i]] = player;
+
+			/*collect the score resulted from calling minimax 
+			on the opponent of the current player*/
+			if (player === 2) {
+				let result = minimax(field, 1, loop, move.index);
+				move.score = result.score;
+
+			} else {
+				let result = minimax(field, 2, loop, move.index);
+				move.score = result.score;
+			}
+
+			// reset the spot to empty
+			field[empty[i]] = 0;
+
+			// push the object to the array
+			moves.push(move);
+		}
+
+		// if it is the computer's turn loop over the moves and choose the move with the highest score
+		let bestMoves = [];
+
+		if (player === 2) {
+			let bestScore = -10000;
+			for (let i = 0; i < moves.length; i++) {
+				if (moves[i].score > bestScore) {
+					bestScore = moves[i].score;
+					bestMoves = [i];
+				} else if (moves[i].score === bestScore) {
+					bestMoves.push(i);
+				}
+			}
+		} else {
+
+			// else loop over the moves and choose the move with the lowest score
+			let bestScore = 10000;
+			for (let i = 0; i < moves.length; i++) {
+				if (moves[i].score < bestScore) {
+					bestScore = moves[i].score;
+					bestMoves = [i];
+				} else if (moves[i].score === bestScore) {
+					bestMoves.push(i);
+				}
+			}
+		}
+
+		return moves[bestMoves[Math.floor(bestMoves.length * Math.random())]];
+	}
+
+	useEffect(() => {
+		if (noOfPlayers === 1 && currentPlayer === 1) {
+
+			let index = minimax([...values], 2, 0);
+
+			handleClick(index.index);
+		}
+	}, [currentPlayer, noOfPlayers]);
 
 	/**
 	 * Get grid template sytle for the squares with amount
@@ -51,15 +170,15 @@ export default function Game(props) {
 	function handleClick(id) {
 		let retVal = false;
 
-		if (gameState === gameStates.Playing) {
+		if (gameState === GAME_STATES.PLAYING) {
 			if (values[id] === 0) {
 				setValues(prevValues => {
 					prevValues[id] = currentPlayer + 1;
 
-					if (checkWin(id)) {
+					if (checkWin(id, values)) {
 						win();
 						retVal = true;
-					} else if (checkDraw()) {
+					} else if (checkDraw(values)) {
 						draw();
 					} else {
 						nextPlayer();
@@ -67,8 +186,8 @@ export default function Game(props) {
 
 					return prevValues;
 				});
-
 			}
+		} else {
 
 		}
 
@@ -78,22 +197,22 @@ export default function Game(props) {
 	/**
 	 * Check if the game has ended as a draw
 	 */
-	function checkDraw() {
-		return values.filter(value => value === 0).length === 0;
+	function checkDraw(field) {
+		return field.filter(value => value === 0).length === 0;
 	}
 
 	/**
 	 * Change game state to draw
 	 */
 	function draw() {
-		setGameState(gameStates.Draw);
+		setGameState(GAME_STATES.DRAW);
 	}
 
 	/**
 	 * Change game state to win
 	 */
 	function win() {
-		setGameState(gameStates.Win);	
+		setGameState(GAME_STATES.WIN);	
 	}
 
 	/**
@@ -152,7 +271,7 @@ export default function Game(props) {
 	function checkWin(id) {
 		let retVal = false;
 
-		const checkedSquares = checkSquares(id);
+		const checkedSquares = checkSquares(id, values);
 
 		if (checkedSquares.length >= winningLength) {
 			setWinningSquares(checkedSquares);
@@ -165,19 +284,19 @@ export default function Game(props) {
 	/**
 	 * Returns longest array of squares in line from the id
 	 */
-	function checkSquares(id) {
+	function checkSquares(id, field) {
 		const neighbours = getNeighbours(id);
 		let returnArr = [];
 
 		for (let i = 0; i < neighbours.length; i++) {
-			if (values[id] === values[neighbours[i]]) {
+			if (field[id] === field[neighbours[i]]) {
 				let offset = neighbours[i] - id;
 				let arr = [id]
 
-				arr = arr.concat(getLength(id, offset));
+				arr = arr.concat(getLength(id, offset, field));
 
 				if (neighbours.includes(id - offset)) {
-					arr = arr.concat(getLength(id, -offset));
+					arr = arr.concat(getLength(id, -offset, field));
 				}
 
 				if (arr.length > returnArr.length) {
@@ -192,14 +311,14 @@ export default function Game(props) {
 	/**
 	 * Get length from the id with the offset
 	 */
-	function getLength(id, offset) {
+	function getLength(id, offset, field) {
 		let neighbour = id + offset;
-		let value = values[id]
+		let value = field[id]
 		let currentId = id;
 		const arr = [];
 
 		while (arr.length < winningLength 
-			&& values[neighbour] === value 
+			&& field[neighbour] === value 
 			&& getNeighbours(currentId).includes(neighbour)) {
 
 			currentId = neighbour;
@@ -208,7 +327,7 @@ export default function Game(props) {
 
 			neighbour = neighbour + offset;
 
-			if (neighbour < 0 || neighbour >= values.length) {
+			if (neighbour < 0 || neighbour >= field.length) {
 				value = 0;
 			}
 
@@ -241,7 +360,7 @@ export default function Game(props) {
 		let delay = []
 
 		// Delay for the animation
-		if (gameState === gameStates.Win) {
+		if (gameState === GAME_STATES.WIN) {
 			for (let i = 0; i < winningSquares.length; i++) {
 				let x = getX(winningSquares[i]);
 				let y = getY(winningSquares[i]);
@@ -257,11 +376,13 @@ export default function Game(props) {
 				<Square 
 					key={i}
 					win={winningSquares.includes(i)}
+					end={gameState === GAME_STATES.WIN}
 					currentPlayer={currentPlayer}
 					symbol={values[i]}
 					playerSymbols={playerSymbols}
-					handleClick={() => handleClick(i)}
+					handleClick={() => handleClick(i, values)}
 					delay={winningSquares.includes(i) ? delay[winningSquares.indexOf(i)] : 0}
+					noOfPlayers={noOfPlayers}
 				/>
 			);
 		}
@@ -274,9 +395,9 @@ export default function Game(props) {
 	 */
 	function getStateText() {
 		switch (gameState) {
-			case gameStates.Playing:
+			case GAME_STATES.PLAYING:
 				return "Current player: " + playerSymbols[currentPlayer];
-			case gameStates.Win:
+			case GAME_STATES.WIN:
 				return "Player " + playerSymbols[currentPlayer] + " won!";
 			default:
 				return "Draw";

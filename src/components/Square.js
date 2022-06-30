@@ -1,7 +1,7 @@
-import React from "react";
+import {useState} from "react";
 
 export default function Square(props) {
-	const [hover, setHover] = React.useState(false);
+	const [hover, setHover] = useState(false);
 
 	const colors = ["#666666", "deepskyblue", "deeppink"]
 
@@ -17,7 +17,11 @@ export default function Square(props) {
 	}
 
 	const toggleHover = function() {
-		setHover(prevHover => !prevHover)
+		if (!props.end) {
+			setHover(prevHover => !prevHover);
+		} else {
+			setHover(false);
+		}
 	}
 
 	const styles = {
@@ -37,11 +41,18 @@ export default function Square(props) {
 		transitionDelay: `${props.delay + 0.4}s`
 	}
 
+	function handleClick() {
+		if (props.noOfPlayers === 1 && props.currentPlayer === 1) {
+			return;
+		}
+		props.handleClick();
+	}
+
 	return (
 		<div 
 			style={props.win ? winStyle : styles} 
 			className="square" 
-			onClick={props.handleClick}
+			onClick={handleClick}
 			onMouseEnter={toggleHover}
 			onMouseLeave={toggleHover}
 		>

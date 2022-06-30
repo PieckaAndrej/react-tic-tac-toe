@@ -1,7 +1,7 @@
-import React from "react";
+import {useState} from "react";
 
 export default function Navbar(props) {
-	const [hover, setHover] = React.useState(false);
+	const [hover, setHover] = useState(false);
 
 	const colors = ["#222222", "deepskyblue", "deeppink"];
 
