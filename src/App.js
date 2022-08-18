@@ -18,12 +18,14 @@ function App() {
 	const [settings, setSettings] = useState(
 		JSON.parse(localStorage.getItem("settings")) ||
 		{
-			show: true,
+			show: false,
 			players: 0,
-			width: 5,
-			height: 5,
+			width: 3,
+			height: 3,
 		}
 	);
+
+	const [showTip, setShowTip] = useState(false);
 
 	const squareNo = settings.width * settings.height;
 	const winningLength = settings.width === 3 ? 3 : 4;
@@ -67,6 +69,7 @@ function App() {
 		setValues(getStartingValues());
 		setGameState(GAME_STATES.PLAYING);
 		setCurrentPlayer(0);
+		setShowTip(false);
 	}
 
 	async function hideSettings(ms) {
@@ -97,6 +100,8 @@ function App() {
 				playerSymbols={playerSymbols}
 				noOfPlayers={settings.players + 1}
 				winningLength={winningLength}
+				showTip={showTip}
+				setShowTip={setShowTip}
 			/>
 			{
 				settings.show ? ( 

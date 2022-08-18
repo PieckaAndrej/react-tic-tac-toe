@@ -1,5 +1,6 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import Square from "./Square";
+import Tip from "./Tip";
 
 export default function Game(props) {
 	const width = props.width;
@@ -23,6 +24,10 @@ export default function Game(props) {
 
 	const winningSquares = props.winningSquares;
 	const setWinningSquares = props.setWinningSquares;
+
+	const showTip = props.showTip;
+	const setShowTip = props.setShowTip;
+
 
 	let maxLoop;
 
@@ -224,6 +229,18 @@ export default function Game(props) {
 		setGameState(GAME_STATES.WIN);	
 	}
 
+	/*
+	 * Show tip on how to restart when the game is finished
+	 */
+	useEffect(() => {
+		if (localStorage.getItem("tip") === null || localStorage.getItem("tip") === true) {
+			if (gameState !== GAME_STATES.PLAYING) {
+				setShowTip(true);
+				localStorage.setItem("tip", false)
+			}
+		}
+	}, [gameState])
+
 	/**
 	 * Get x coordinate from the id
 	 */
@@ -415,6 +432,7 @@ export default function Game(props) {
 
 	return (
 		<div className="field">
+			{showTip && <Tip text="Reset" hideTip={() => setShowTip(false)}/>}
 			<div className="field--grid" style={styles}>
 				{getSquares()}
 			</div>
