@@ -1,17 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
-.App {
+body {
   background-color: #111111;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+	height: 8px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background-color: #777777; 
+  border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #aaaaaa; 
+}
+
+.App {
   color: white;
-	height: 100vh;
 }
 
 .field {
+	padding-top: 100px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
-	height: calc(100vh - 100px);
+	min-height: calc(100vh - 100px);
 	width: auto;
 }
 
@@ -41,12 +61,16 @@
 }
 
 nav {
-	position: relative;
+	position: fixed;
+	top: 0;
 	display: flex;
 	align-items: center;
 	padding: 10px;
 	overflow: hidden;
-	box-shadow: 0px 3px 5px 3px rgba(0, 0, 0, 0.1)
+	box-shadow: 0px 3px 5px 3px rgba(0, 0, 0, 0.1);
+	z-index: 1;
+	width: 100%;
+	height: 70px;
 }
 
 .nav--image {
@@ -74,8 +98,11 @@ nav {
   background-color: #111111;
 	border: 5px solid #222222;
 	border-radius: 5px;
-	padding: 20px;
+	padding: 10px 20px 20px 20px;
 	animation-duration: 0.3s;
+	z-index: 2;
+	max-height: 80%;
+	overflow-y: auto;
 }
 
 @keyframes hide {
@@ -83,11 +110,13 @@ nav {
 		top: 50%;
 		left: 50;
 		opacity: 1;
+		transform: scale(100%, 100%) translate(-50%, -50%);
 	}
 	100% {
 		top: 60%;
 		left: 60%;
 		opacity: 0;
+		transform: scale(80%, 80%) translate(-50%, -50%);
 	}
 }
 
@@ -96,11 +125,13 @@ nav {
 		top: 60%;
 		left: 60%;
 		opacity: 0;
+		transform: scale(80%, 80%) translate(-50%, -50%);
 	}
 	100% {
 		top: 50%;
 		left: 50;
 		opacity: 1;
+		transform: scale(100%, 100%) translate(-50%, -50%);
 	}
 }
 
@@ -112,19 +143,19 @@ nav {
 
 .settings--title {
 	text-align: center;
-	margin: 10px;
+	margin: 5px;
 }
 
 .settings--content button {
+	cursor: pointer;
 	background-color: #111111;
 	color: white;
 	border: 5px solid #222222;
 	border-radius: 5px;
-	min-width: 20vh;
-	max-width: 300px;
-	height: 100px;
+	min-width: 150px;
+	min-height: 80px;
 	font-family: 'Open Sans', sans-serif;
-	font-size: 2rem;
+	font-size: 1.7rem;
 	transition: 0.3s;
 }
 

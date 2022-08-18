@@ -24,6 +24,8 @@ export default function Game(props) {
 	const winningSquares = props.winningSquares;
 	const setWinningSquares = props.setWinningSquares;
 
+	let maxLoop;
+
 	/**
 	 * Styles for the squares
 	 */
@@ -65,21 +67,21 @@ export default function Game(props) {
 
 		loop++;
 
-		if (empty.length === 0 || loop > 4) {
+		if (empty.length === 0 || loop > maxLoop) {
 			const length = checkSquares(index, field).length;
 
-			if (player === 1) {
-				return {score: length};
+			if (player === 2) {
+				return {score: -length, win: false};
 
 			} else {
-				return {score: -length};
+				return {score: length, win: false};
 			}
 
 		} else if (winning(field, 1)) {
-			return {score: -20 + loop};
+			return {score: -20 + loop, win: true};
 
 		} else if (winning(field, 2)) {
-			return {score: 20 - loop};
+			return {score: 20 - loop, win: true};
 		} 
 
 		const moves = [];
@@ -93,15 +95,21 @@ export default function Game(props) {
 			// set the empty spt to the current player
 			field[empty[i]] = player;
 
+			let result = {};
+
 			/*collect the score resulted from calling minimax 
 			on the opponent of the current player*/
 			if (player === 2) {
-				let result = minimax(field, 1, loop, move.index);
-				move.score = result.score;
+				result = minimax(field, 1, loop, move.index);
 
 			} else {
-				let result = minimax(field, 2, loop, move.index);
-				move.score = result.score;
+				result = minimax(field, 2, loop, move.index);
+			}
+
+			move.score = result.score;
+
+			if (result.win) {
+				maxLoop = loop;
 			}
 
 			// reset the spot to empty
@@ -144,6 +152,7 @@ export default function Game(props) {
 	useEffect(() => {
 		if (noOfPlayers === 1 && currentPlayer === 1) {
 
+			maxLoop = 4;
 			let index = minimax([...values], 2, 0);
 
 			handleClick(index.index);
